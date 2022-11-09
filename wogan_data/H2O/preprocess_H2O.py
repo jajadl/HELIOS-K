@@ -62,6 +62,14 @@ def main():
                 aa = a.replace("HITEMP2010",'hitemp10hitran16')
             if "HITRAN2016" in a:
                 aa = a.replace("HITRAN2016",'hitemp10hitran16')
+
+            tmp = aa.split('_')
+            start = tmp[1].split('-')[0]
+            start = start.rjust(5, '0')
+            end = tmp[1].split('-')[1]
+            end = end.rjust(5, '0')
+            tmp[1] = start+'-'+end
+            aa = "_".join(tmp)
             shutil.copy('extract/'+a, '../../'+aa)
             tmp_files.append(aa)
 
