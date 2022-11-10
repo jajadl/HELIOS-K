@@ -1,8 +1,15 @@
 import subprocess
 import os
 import shutil
+import zipfile
+
 
 def main():
+
+    ffile = "03_HITRAN2016.par.zip"
+
+    with zipfile.ZipFile('downloads/'+ffile, 'r') as zip_ref:
+        zip_ref.extractall('extract')
 
     # copy files to the main directory
     tmp_files = []
