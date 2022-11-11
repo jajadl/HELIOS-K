@@ -1,12 +1,28 @@
 import subprocess
 from wogan_data import bins
+import os
+import numpy as np
 
 # For running heliosk multiple times for different T values
 
 def run(param_file):
 
+    found = False
+    for a in os.listdir('.'):
+        if '_bin0000.dat' in a:
+            results = np.loadtxt(a)
+            found = True
+            break
+
+    if found:
+        T_max = np.max(results[:,2])
+        ind = np.argmin(np.abs(bins.T_grid-T_max))
+        TT = bins.T_grid[ind+1:]
+    else:
+        TT = bins.T_grid
+
     # loop over temperature bins
-    for T in bins.T_grid:
+    for T in TT:
 
         # copy parameters file
         with open(param_file,'r') as f:
