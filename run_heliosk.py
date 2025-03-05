@@ -1,5 +1,5 @@
 import subprocess
-from wogan_data import bins
+from wogan_data.bins import T_grid
 import os
 import numpy as np
 
@@ -16,10 +16,10 @@ def run(param_file):
 
     if found:
         T_max = np.max(results[:,2])
-        ind = np.argmin(np.abs(bins.T_grid-T_max))
-        TT = bins.T_grid[ind+1:]
+        ind = np.argmin(np.abs(T_grid-T_max))
+        TT = T_grid[ind+1:]
     else:
-        TT = bins.T_grid
+        TT = T_grid
 
     # loop over temperature bins
     for T in TT:

@@ -8,6 +8,9 @@ T_grid = np.array([
 1600., 1800., 2000. 
 ])
 
+# For CH4
+T_grid_CH4 = np.append([50.0,75.0],T_grid)
+
 # bar
 P_grid = np.array([
 1.00000000e-05, 1.58489319e-05, 2.51188643e-05, 3.98107171e-05,
