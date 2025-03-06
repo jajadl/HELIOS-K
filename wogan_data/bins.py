@@ -11,8 +11,8 @@ T_grid = np.array([
 # For CH4
 T_grid_CH4 = np.append([50.0,75.0],T_grid)
 
-# bar
-P_grid = np.array([
+# atmospheres
+P_grid_atm = np.array([
 1.00000000e-05, 1.58489319e-05, 2.51188643e-05, 3.98107171e-05,
 6.30957344e-05, 1.00000000e-04, 1.58489319e-04, 2.51188643e-04,
 3.98107171e-04, 6.30957344e-04, 1.00000000e-03, 1.58489319e-03,
@@ -24,7 +24,14 @@ P_grid = np.array([
 2.51188643e+01, 3.98107171e+01, 6.30957344e+01, 1.00000000e+02,
 1.58489319e+02, 2.51188643e+02, 3.98107171e+02, 6.30957344e+02,
 1.00000000e+03
-])
+])*1.01325
+
+# bars
+P_grid = P_grid_atm*1.01325
+
+# Fixed pressure grid. I compute opacties at e.g. 1.01325 atm. This corresponds to
+# 1.01325 atm * (1.01325 bar/ 1 atm) = 1.0266755625 bar pressure. I meant to compute 
+# the opacity as 1 bar, but originally did the conversion wrong
 
 wavnum = np.array([
 100000,  90000,  80000,  70000,  60000,  50000,  42087,  36363,
