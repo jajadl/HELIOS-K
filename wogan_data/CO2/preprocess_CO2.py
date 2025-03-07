@@ -3,7 +3,7 @@ import zipfile
 import os
 import shutil
 
-folder = 'https://hitran.org/hitemp/data/HITEMP-2010/CO2_line_list/'
+folder = 'https://hitran.org/files/HITEMP/HITEMP-2010/CO2_line_list/'
 files = """
 02_00000-00500_HITEMP2010.zip
 02_00500-00625_HITEMP2010.zip
@@ -31,7 +31,7 @@ def main():
 
     # Download HITEMP data
     for ffile in files:
-        cmd = 'wget '+folder+ffile
+        cmd = 'wget --load-cookies=cookies.txt '+folder+ffile
         subprocess.run(cmd.split())
         os.rename(ffile, 'downloads/'+ffile)
 
