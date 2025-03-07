@@ -3,7 +3,7 @@ import bz2
 import os
 import shutil
 
-folder = 'https://hitran.org/hitemp/data/bzip2format/'
+folder = 'https://hitran.org/files/HITEMP/bzip2format/'
 ffile = "04_HITEMP2019.par.bz2"
 
 def main():
