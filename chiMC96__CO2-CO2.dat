@@ -1,0 +1,11 @@
+sigma1 3.0
+sigma2 10.0
+sigma3 90.0
+
+B	alpha 	beta 	epsilon
+B1	0.090	-0.160	0.00410
+B2	-0.014	0.0526	0.00152
+B3	0.014	0.0	0.0
+
+range in cm^-1
+1   100000

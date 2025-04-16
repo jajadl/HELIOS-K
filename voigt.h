@@ -64,9 +64,13 @@ __device__ float sLChi(float Dnu){
 	else if(Dnu < sigma3){
 		chi = exp(-B1 * (sigma2 - sigma1) - B2 * (Dnu - sigma2));
 	}
-	else{
+	else if(Dnu < 150.0f){
+    // Here I'm hard coding part of Meadows and Crisp (1996) chi factors
 		chi = exp(-B1 * (sigma2 - sigma1) - B2 * (sigma3 - sigma2) - B3 * (Dnu - sigma3));
 	}
+  else {
+    chi = exp(-B1 * (sigma2 - sigma1) - B2 * (sigma3 - sigma2) - B3 * (150.0f - sigma3));
+  }
 
 	return chi;
 }

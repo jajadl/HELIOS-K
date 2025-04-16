@@ -30,6 +30,6 @@ doMean = 0
 Units = 1
 ReplaceFiles = 0
 profile = 1
-subLorentzianfile = chiPH89__CO2-CO2.dat
+subLorentzianfile = chiMC96__CO2-CO2.dat
 removePlinth = 0
 doTuning = 0
