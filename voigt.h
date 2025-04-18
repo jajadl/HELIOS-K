@@ -65,12 +65,12 @@ __host__ void subLorentzianB(double T){
 	float B1_1 = alpha1_1 + beta1 * exp(-epsilon1 * T);
 	float B2_1 = alpha2_1 + beta2 * exp(-epsilon2 * T);
 	float B3_1 = alpha3_1 + beta3 * exp(-epsilon3 * T);
-  float B3_1 = alpha4_1 + beta4 * exp(-epsilon4 * T);
+  float B4_1 = alpha4_1 + beta4 * exp(-epsilon4 * T);
 
   float B1_2 = alpha1_2 + beta1 * exp(-epsilon1 * T);
 	float B2_2 = alpha2_2 + beta2 * exp(-epsilon2 * T);
 	float B3_2 = alpha3_2 + beta3 * exp(-epsilon3 * T);
-  float B3_2 = alpha4_2 + beta4 * exp(-epsilon4 * T);
+  float B4_2 = alpha4_2 + beta4 * exp(-epsilon4 * T);
 
   // Zero out everything
   for (int i = 0; i < 17; i++){
@@ -97,6 +97,7 @@ __host__ void subLorentzianConstantCopy(int useSubLorentzian){
 
 
 __device__ float sLChi_helper(float Dnu, float sigma1, float sigma2, float sigma3, float sigma4, float B1, float B2, float B3, float B4, float Dnu_max){
+  float chi;
 
   Dnu = min(Dnu, Dnu_max);
   sigma1 = min(sigma1, Dnu_max);
@@ -234,7 +235,7 @@ __device__ float sLChi(float Dnu, double nu){
 
   }
 
-  chi = sLChi_helper(Dnu, sigma1, sigma2, sigma3, sigma4, B1, B2, B3, B4, Dnu_max)
+  chi = sLChi_helper(Dnu, sigma1, sigma2, sigma3, sigma4, B1, B2, B3, B4, Dnu_max);
   
 	return chi;
 }
