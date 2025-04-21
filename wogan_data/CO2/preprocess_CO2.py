@@ -1,11 +1,29 @@
 import subprocess
-import zipfile
 import bz2
 import os
 import shutil
+from tqdm import tqdm
 
 folder = 'https://hitran.org/files/HITEMP/bzip2format/'
 CO2_file = '02_HITEMP2024.par.bz2'
+
+def decompress_bz2_with_progress(input_path, output_path):
+    """Decompresses a bz2 file and displays a progress bar.
+
+    Args:
+        input_path (str): Path to the input bz2 file.
+        output_path (str): Path to save the decompressed output.
+    """
+    total_size = os.path.getsize(input_path)
+
+    with bz2.open(input_path, 'rb') as bz2_file, open(output_path, 'wb') as output_file:
+        with tqdm(desc=input_path, total=total_size, unit='iB', unit_scale=True, unit_divisor=1024) as pbar:
+            while True:
+                chunk = bz2_file.read(1024)
+                if not chunk:
+                    break
+                output_file.write(chunk)
+                pbar.update(len(chunk))
 
 def main():
 
@@ -15,9 +33,7 @@ def main():
     os.rename(CO2_file, 'downloads/'+CO2_file)
 
     # unzip the HITEMP data
-    with open('extract/'+CO2_file[:-4], 'wb') as new_file, bz2.BZ2File('downloads/'+CO2_file, 'rb') as f:
-        for data in iter(lambda : f.read(100 * 1024), b''):
-            new_file.write(data)
+    decompress_bz2_with_progress('downloads/'+CO2_file, 'extract/'+CO2_file[:-4])
 
     # copy files to the main directory
     tmp_files = []
