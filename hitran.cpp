@@ -87,13 +87,11 @@ int main(int argc, char *argv[]){
 
 	char index[20][4];
 	char qfile[20][32];
-	char c[4];
 	double abundance[20];
 	double m[20];
 	double Q0[20];
 	double g[20];
 	char formula[20][32];
-	char skip[4];
 
 
 	int nISO = 0;
@@ -112,8 +110,8 @@ int main(int argc, char *argv[]){
 		sprintf(ii, "%.2s", iii);
 		int molecule = atoi(ii);
 
-		char iiso[1];
-		sprintf(iiso, "%s", &iii[2]);
+		char iiso[2];
+		sprintf(iiso, "%.1s", &iii[2]);
 
 		//printf("%d |%s|%s| %g | %d %d |%s|\n", nISO, index[nISO], iii, abundance[nISO], molecule, M, iiso);
 
@@ -279,7 +277,7 @@ int main(int argc, char *argv[]){
 
 			char skip[161];
 
-			for(int i = 0; i < 100000000; ++i){
+			for(int i = 0; i < 1000000000; ++i){
 
 				if(fgets(c1, 3, dataFile) == NULL){
 					int nnu;
