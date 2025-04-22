@@ -9,7 +9,7 @@ __constant__ int useSubLorentzian_c[1];
 //Author Simon Grimm
 //August 2020
 // **********************************************
-__host__ void subLorentzianB_OLD(double T){
+__host__ void subLorentzianB(double T){
 
 	float alpha1   = sLchi_h[3];
 	float beta1    = sLchi_h[4];
@@ -33,212 +33,44 @@ __host__ void subLorentzianB_OLD(double T){
 
 	cudaMemcpyToSymbol(sLchi_c, sLchi_h, 17 * sizeof(float), 0, cudaMemcpyHostToDevice);
 }
-
-// *********************************************
-// This function calculates the B factors for the
-// sub-Lorentzian chi factors used in Robinson and Crisp (2018).
-// **********************************************
-__host__ void subLorentzianB(double T){
-
-  // Perrin and Hartmann (1986)
-	float alpha1_1 = 0.0888f;
-	float alpha2_1 = 0.0000f;
-	float alpha3_1 = 0.0232f;
-  float alpha4_1 = 0.0232f;
-
-  // Burch et al. (1969) and Meadows and Crisp (1996)
-	float alpha1_2 = 0.09f;
-	float alpha2_2 = -0.014f;
-	float alpha3_2 = 0.014f;
-  float alpha4_2 = 0.000f;
-
-  // Perrin and Hartmann (1986)
-  float beta1 = -0.160f;
-  float beta2 = 0.0526f;
-  float beta3 = 0.0f;
-  float beta4 = 0.0f;
-  float epsilon1 = 0.0041f;
-  float epsilon2 = 0.00152f;
-  float epsilon3 = 0.0f;
-  float epsilon4 = 0.0f;
-
-	float B1_1 = alpha1_1 + beta1 * exp(-epsilon1 * T);
-	float B2_1 = alpha2_1 + beta2 * exp(-epsilon2 * T);
-	float B3_1 = alpha3_1 + beta3 * exp(-epsilon3 * T);
-  float B4_1 = alpha4_1 + beta4 * exp(-epsilon4 * T);
-
-  float B1_2 = alpha1_2 + beta1 * exp(-epsilon1 * T);
-	float B2_2 = alpha2_2 + beta2 * exp(-epsilon2 * T);
-	float B3_2 = alpha3_2 + beta3 * exp(-epsilon3 * T);
-  float B4_2 = alpha4_2 + beta4 * exp(-epsilon4 * T);
-
-  // Zero out everything
-  for (int i = 0; i < 17; i++){
-    sLchi_h[i] = 0.0f;
-  }
-
-  // Save the B factors for later
-	sLchi_h[0] = B1_1;
-  sLchi_h[1] = B2_1;
-  sLchi_h[2] = B3_1;
-  sLchi_h[3] = B4_1;
-
-  sLchi_h[4] = B1_2;
-  sLchi_h[5] = B2_2;
-  sLchi_h[6] = B3_2;
-  sLchi_h[7] = B4_2;
-
-	cudaMemcpyToSymbol(sLchi_c, sLchi_h, 17 * sizeof(float), 0, cudaMemcpyHostToDevice);
-}
-
 __host__ void subLorentzianConstantCopy(int useSubLorentzian){
 	cudaMemcpyToSymbol(useSubLorentzian_c, &useSubLorentzian, sizeof(int), 0, cudaMemcpyHostToDevice);
 }
 
-
-__device__ float sLChi_helper(float Dnu, float sigma1, float sigma2, float sigma3, float sigma4, float B1, float B2, float B3, float B4, float Dnu_max){
-  float chi;
-
-  Dnu = min(Dnu, Dnu_max);
-  sigma1 = min(sigma1, Dnu_max);
-  sigma2 = min(sigma2, Dnu_max);
-  sigma3 = min(sigma3, Dnu_max);
-  sigma4 = min(sigma4, Dnu_max);
-
-  if (Dnu < sigma1){
-    chi = 1.0f;
-  }
-  else if (Dnu >= sigma1 && Dnu < sigma2){
-    chi = exp(-B1 * (Dnu - sigma1));
-  }
-  else if (Dnu >= sigma2 && Dnu < sigma3){
-    chi = exp(-B1 * (sigma2 - sigma1) - B2 * (Dnu - sigma2));
-  }
-  else if (Dnu >= sigma3 && Dnu < sigma4){
-    chi = exp(-B1 * (sigma2 - sigma1) - B2 * (sigma3 - sigma2) - B3 * (Dnu - sigma3));
-  }
-  else if (Dnu >= sigma4){
-    chi = exp(-B1 * (sigma2 - sigma1) - B2 * (sigma3 - sigma2) - B3 * (sigma4 - sigma3) - B4 * (Dnu - sigma4));
-  }
-
-  return chi;
-}
-
 // *********************************************
-// This function hard codes the chi factors used in Robinson and Crisp (2018)
-// with the LBLABC line by line code. The treatment is special for Venus and 
-// largely based on Meadows and Crisp (1996).
+// This function calculates the chi factors for the
+// Perrin and Hartmann 1989 sub-Lorentzian correction
+//
+//Author Simon Grimm
+//August 2020
 // **********************************************
-__device__ float sLChi(float Dnu, double nu){
+__device__ float sLChi(float Dnu){
 	float chi;
 
-  float sigma1;
-  float sigma2;
-  float sigma3;
-  float sigma4;
+	float sigma1 = sLchi_c[0];
+	float sigma2 = sLchi_c[1];
+	float sigma3 = sLchi_c[2];
 
-	float B1;
-	float B2;
-	float B3;
-  float B4;
+	float B1 = sLchi_c[14];
+	float B2 = sLchi_c[15];
+	float B3 = sLchi_c[16];
 
-  float Dnu_max;
+	if(Dnu < sigma1){
+		chi = 1.0f;
+	}
+	else if(Dnu < sigma2){
+		chi = exp(-B1 * (Dnu - sigma1));
+	}
+	else if(Dnu < sigma3){
+		chi = exp(-B1 * (sigma2 - sigma1) - B2 * (Dnu - sigma2));
+	}
+	else{
+		chi = exp(-B1 * (sigma2 - sigma1) - B2 * (sigma3 - sigma2) - B3 * (Dnu - sigma3));
+	}
 
-  if (nu < 3300.0){
-
-    sigma1 = 3.0f;
-    sigma2 = 30.0f;
-    sigma3 = 90.0f;
-    sigma4 = 200.0f;
-    
-    B1 = sLchi_c[0];
-    B2 = sLchi_c[1];
-    B3 = sLchi_c[2];
-    B4 = sLchi_c[3];
-
-    Dnu_max = 1000.0f;
-
-  }
-  else if (nu >= 3300.0 && nu < 4300.0){
-
-    sigma1 = 3.0f;
-    sigma2 = 30.0f;
-    sigma3 = 90.0f;
-    sigma4 = 200.0f;
-    
-    B1 = sLchi_c[0];
-    B2 = sLchi_c[1];
-    B3 = sLchi_c[2];
-    B4 = sLchi_c[3];
-
-    Dnu_max = 300.0f;
-
-  }
-  else if (nu >= 4300.0 && nu < 5000.0){
-
-    sigma1 = 3.0f;
-    sigma2 = 30.0f;
-    sigma3 = 90.0f;
-    sigma4 = 200.0f;
-    
-    B1 = sLchi_c[0];
-    B2 = sLchi_c[1];
-    B3 = sLchi_c[2];
-    B4 = sLchi_c[3];
-
-    Dnu_max = 300.0f;
-
-  }
-  else if (nu >= 5000.0 && nu < 7000.0){
-
-    sigma1 = 3.0f;
-    sigma2 = 30.0f;
-    sigma3 = 90.0f;
-    sigma4 = 200.0f;
-    
-    B1 = sLchi_c[4];
-    B2 = sLchi_c[5];
-    B3 = sLchi_c[6];
-    B4 = sLchi_c[7];
-
-    Dnu_max = 350.0f;
-
-  }
-  else if (nu >= 7000.0 && nu < 8000.0){
-
-    sigma1 = 3.0f;
-    sigma2 = 10.0f;
-    sigma3 = 90.0f;
-    sigma4 = 200.0f;
-    
-    B1 = sLchi_c[4];
-    B2 = sLchi_c[5];
-    B3 = sLchi_c[6];
-    B4 = sLchi_c[7];
-
-    Dnu_max = 300.0f;
-
-  }
-  else if (nu >= 8000.0){
-
-    sigma1 = 3.0f;
-    sigma2 = 10.0f;
-    sigma3 = 90.0f;
-    sigma4 = 200.0f;
-    
-    B1 = sLchi_c[4];
-    B2 = sLchi_c[5];
-    B3 = sLchi_c[6];
-    B4 = sLchi_c[7];
-
-    Dnu_max = 300.0f;
-
-  }
-
-  chi = sLChi_helper(Dnu, sigma1, sigma2, sigma3, sigma4, B1, B2, B3, B4, Dnu_max);
-  
 	return chi;
 }
+
 
 // *********************************************
 //This function calculates the Series Sigma1. Sigma2 and Sigma3 (Equations 27, 28, and 29) from Alg 916
@@ -1503,9 +1335,9 @@ __global__ void Line6fAX_kernel(float *S1_d, float *vy_d, double *nu_d, double *
 //printf("x %d   %d %g %g %g %g %g %g\n", LR, iL, x_s[ii], x, S1, y, nu, ialphaD);
 
 							float chinu = 1.0f;
-							if(useSubLorentzian_c[0] == 1){
+							if(useSubLorentzian_c[0] == 1 && x_s[ii] > sLchi_c[12] && x_s[ii] < sLchi_c[13]){
 								float Dnu = fabsf(float(x_s[ii] - nu));
-								float chi = sLChi(Dnu, x_s[ii]);
+								float chi = sLChi(Dnu);
 								chinu = chi * x_s[ii] / nu;
 //if(nu > 2330.0035 && nu < 2330.0036)
 //printf("chiA %.12g %.12g %.12g %.12g %.12g\n", x_s[ii], nu, Dnu, chi, x_s[ii] / nu);
@@ -1522,9 +1354,9 @@ __global__ void Line6fAX_kernel(float *S1_d, float *vy_d, double *nu_d, double *
 				if(profile == 2){  //Lorentz
 					if(t1 < vcut2){	
 						float chinu = 1.0f;
-						if(useSubLorentzian_c[0] == 1){
+						if(useSubLorentzian_c[0] == 1 && x_s[ii] > sLchi_c[12] && x_s[ii] < sLchi_c[13]){
 							float Dnu = fabsf(float(x_s[ii] - nu));
-							float chi = sLChi(Dnu, x_s[ii]);
+							float chi = sLChi(Dnu);
 							chinu = chi * x_s[ii] / nu;
 						}
 
@@ -1538,9 +1370,9 @@ __global__ void Line6fAX_kernel(float *S1_d, float *vy_d, double *nu_d, double *
 				if(profile == 3){  //Doppler
 					if(t1 < vcut2){	
 						float chinu = 1.0f;
-						if(useSubLorentzian_c[0] == 1){
+						if(useSubLorentzian_c[0] == 1 && x_s[ii] > sLchi_c[12] && x_s[ii] < sLchi_c[13]){
 							float Dnu = fabsf(float(x_s[ii] - nu));
-							float chi = sLChi(Dnu, x_s[ii]);
+							float chi = sLChi(Dnu);
 							chinu = chi * x_s[ii] / nu;
 						}
 
@@ -1561,9 +1393,9 @@ __global__ void Line6fAX_kernel(float *S1_d, float *vy_d, double *nu_d, double *
 						float dd = 1.0f / (ialphaD * dnu);
 
 						float chinu = 1.0f;
-						if(useSubLorentzian_c[0] == 1){
+						if(useSubLorentzian_c[0] == 1 && x_s[ii] > sLchi_c[12] && x_s[ii] < sLchi_c[13]){
 							float Dnu = fabsf(float(x_s[ii] - nu));
-							float chi = sLChi(Dnu, x_s[ii]);
+							float chi = sLChi(Dnu);
 							chinu = chi * x_s[ii] / nu;
 						}
 
@@ -1738,9 +1570,9 @@ __global__ void Line6fBX_kernel(float *S1_d, float *vy_d, double *nu_d, double *
 					float t4 = (t3 * (2.0f * t2 + xxyy) - 2.0f * t1) / (3.0f * xxyy * (t3 * t2 - t1));
 
 					float chinu = 1.0f;
-					if(useSubLorentzian_c[0] == 1){
+					if(useSubLorentzian_c[0] == 1 && x_s[ii] > sLchi_c[12] && x_s[ii] < sLchi_c[13]){
 						float Dnu = fabsf(float(x_s[ii] - nu));
-						float chi = sLChi(Dnu, x_s[ii]);
+						float chi = sLChi(Dnu);
 						chinu = chi * x_s[ii] / nu;
 
 //if(nu > 2330.0035 && nu < 2330.0036)
@@ -1944,9 +1776,9 @@ __global__ void Line6fCX_kernel(float *S_d, float *vy_d, double *nu_d, double *i
 					if(y == 0.0f) t1 = ex2;
 
 					float chinu = 1.0f;
-					if(useSubLorentzian_c[0] == 1){
+					if(useSubLorentzian_c[0] == 1 && x_s[ii] > sLchi_c[12] && x_s[ii] < sLchi_c[13]){
 						float Dnu = fabsf(float(x_s[ii] - nu));
-						float chi = sLChi(Dnu, x_s[ii]);
+						float chi = sLChi(Dnu);
 						chinu = chi * x_s[ii] / nu;
 //if(nu > 2330.0035 && nu < 2330.0036)
 //printf("chiC %.12g %.12g %.12g %.12g %.12g\n", x_s[ii], nu, Dnu, chi, x_s[ii] / nu);
