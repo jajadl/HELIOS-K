@@ -29,14 +29,6 @@ files = """
 
 def main():
 
-    # Get partition files
-    q_files = [7,8,9,10,11,12,13,14,121,15,120,122]
-    for q in q_files:
-        filename = 'q%i.txt'%(q)
-        cmd = 'wget https://hitran.org/data/Q/'+filename
-        subprocess.run(cmd.split())
-        os.rename(filename, 'data/'+filename)
-
     # Download HITEMP data
     for ffile in files:
         cmd = 'wget --load-cookies=cookies.txt '+folder+ffile
@@ -65,7 +57,8 @@ def main():
             shutil.copy('extract/'+a, '../../'+aa)
             tmp_files.append(aa)
 
-    cmd = "./hitran -M 02 -in hitemp10"
+    # preprocess the files
+    cmd = "./hitran -M 02 -ISO 1 -in hitemp10"
     subprocess.run(cmd.split(), cwd='../../')
 
     # move processesed data files into data dir
