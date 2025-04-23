@@ -39,7 +39,7 @@ def run_all():
     species = ['C2H2','C2H6','CH4','CO','CO2','H2O','HCl','N2O','NH3','O2','O3','OCS','SO2']
     for sp in species:
         param_file = "wogan_data/"+sp+"/param.dat_"+sp
-        run(param_file)
+        run(sp, param_file)
 
 if __name__ == "__main__":
     # param_file = "wogan_data/H2O/param.dat_H2O"
