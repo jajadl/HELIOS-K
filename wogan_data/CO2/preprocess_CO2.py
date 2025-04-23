@@ -31,7 +31,7 @@ def main():
 
     # Download HITEMP data
     for ffile in files:
-        cmd = 'wget --load-cookies=cookies.txt '+folder+ffile
+        cmd = 'wget --load-cookies=../../cookies.txt '+folder+ffile
         subprocess.run(cmd.split())
         os.rename(ffile, 'downloads/'+ffile)
 

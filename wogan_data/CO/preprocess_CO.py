@@ -3,13 +3,13 @@ import bz2
 import os
 import shutil
 
-folder = 'https://hitran.org/hitemp/data/bzip2format/'
+folder = 'https://hitran.org/files/HITEMP/bzip2format/'
 ffile = "05_HITEMP2019.par.bz2"
 
 def main():
 
     # Download HITEMP data
-    cmd = 'wget '+folder+ffile
+    cmd = 'wget --load-cookies=../../cookies.txt '+folder+ffile
     subprocess.run(cmd.split())
     os.rename(ffile, 'downloads/'+ffile)
 

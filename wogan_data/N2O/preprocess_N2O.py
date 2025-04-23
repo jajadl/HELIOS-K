@@ -13,7 +13,7 @@ def main():
     os.rename('q21.txt', 'data/q21.txt')
 
     # Download HITEMP data
-    cmd = 'wget '+folder+ffile
+    cmd = 'wget --load-cookies=../../cookies.txt '+folder+ffile
     subprocess.run(cmd.split())
     os.rename(ffile, 'downloads/'+ffile)
 

@@ -2,17 +2,16 @@ import subprocess
 from wogan_data.bins import T_grid
 import os
 import numpy as np
+import preprocess
 
 # For running heliosk multiple times for different T values
 
-def run(param_file):
+def run(species, param_file):
 
     found = False
-    for a in os.listdir('.'):
-        if '_bin0000.dat' in a:
-            results = np.loadtxt(a)
-            found = True
-            break
+    if 'Out_'+species+'_bin0000.dat' in os.listdir('.'):
+        results = np.loadtxt('Out_'+species+'_bin0000.dat')
+        found = True
 
     if found:
         T_max = np.max(results[:,2])
@@ -32,8 +31,17 @@ def run(param_file):
             for line in lines:
                 f.write(line)
 
-        subprocess.run("./heliosk")
+        res = subprocess.run("./heliosk")
+        assert res.returncode == 0
+
+def run_all(): 
+    preprocess.main()
+    species = ['C2H2','C2H6','CH4','CO','CO2','H2O','HCl','N2O','NH3','O2','O3','OCS','SO2']
+    for sp in species:
+        param_file = "wogan_data/"+sp+"/param.dat_"+sp
+        run(param_file)
 
 if __name__ == "__main__":
-    param_file = "wogan_data/H2O/param.dat_H2O"
-    run(param_file)
+    # param_file = "wogan_data/H2O/param.dat_H2O"
+    # run(param_file)
+    run_all()

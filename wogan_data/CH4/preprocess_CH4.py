@@ -9,7 +9,7 @@ CH4_file = "06_HITEMP2020.par.bz2"
 def main():
 
     # Download HITEMP data
-    cmd = 'wget --load-cookies=cookies.txt '+folder+CH4_file
+    cmd = 'wget --load-cookies=../../cookies.txt '+folder+CH4_file
     subprocess.run(cmd.split())
     os.rename(CH4_file, 'downloads/'+CH4_file)
 

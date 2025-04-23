@@ -8,7 +8,7 @@ def main():
 
     # isotope stuff
     cmd = 'wget https://hitran.org/data/Q/q76.txt'
-    subprocess.run(cmd.split())
+    subprocess.call(cmd.split())
     os.rename('q76.txt', 'data/q76.txt')
 
     # Download
