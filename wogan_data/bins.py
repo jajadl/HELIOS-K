@@ -8,11 +8,8 @@ T_grid = np.array([
 1600., 1800., 2000. 
 ])
 
-# For CH4
-T_grid_CH4 = np.append([50.0,75.0],T_grid)
-
-# atmospheres
-P_grid_atm = np.array([
+# Bars
+P_grid = np.array([
 1.00000000e-05, 1.58489319e-05, 2.51188643e-05, 3.98107171e-05,
 6.30957344e-05, 1.00000000e-04, 1.58489319e-04, 2.51188643e-04,
 3.98107171e-04, 6.30957344e-04, 1.00000000e-03, 1.58489319e-03,
@@ -24,22 +21,19 @@ P_grid_atm = np.array([
 2.51188643e+01, 3.98107171e+01, 6.30957344e+01, 1.00000000e+02,
 1.58489319e+02, 2.51188643e+02, 3.98107171e+02, 6.30957344e+02,
 1.00000000e+03
-])*1.01325
+])
 
-# bars
-P_grid = P_grid_atm*1.01325
+# atms
+P_grid_atm = P_grid*(1/1.01325)
 
-# Fixed pressure grid. I compute opacties at e.g. 1.01325 atm. This corresponds to
-# 1.01325 atm * (1.01325 bar/ 1 atm) = 1.0266755625 bar pressure. I meant to compute 
-# the opacity as 1 bar, but originally did the conversion wrong
-
+# 1/cm
 wavnum = np.array([
 100000,  90000,  80000,  70000,  60000,  50000,  42087,  36363,
 35087,  32562,  30376,  29308,  25641,  22222,  18518,  18198,
 17649,  16528,  16000,  15000,  14470,  13300,  12790,  11870,
 11220,  10400,   9650,   9350,   8850,   8315,   7650,   6990,
-6390,   5925,   5370,   4950,   4540,   4030,   3760,   3425,
-3087,   2796,   2494,   2397,   2200,   2050,   1950,   1850,
+6390,   5925,   5370,   4950,   4540,   4030,   3760,   3425,   3171,
+3087,   3014,   2941,   2868,   2796,   2720,   2645,   2494,   2397,   2200,   2050,   1950,   1850,
 1750,   1650,   1550,   1450,   1350,   1275,   1200,   1108,
 1065,   1000,    940,    875,    800,    720,    667,    617,
 545,    495,    440,    380,    330,    280,    220,    160,
@@ -59,3 +53,15 @@ weights = np.array([
 1.63036288715636482E-02,
 8.69637112843634277E-03
 ])
+
+def weights_to_bins(weights):
+    bins = np.empty(len(weights)+1)
+    bins[0] = 0.0
+    for i in range(1,len(bins)):
+        bins[i] = weights[i-1] + bins[i-1]
+    return bins
+edges = weights_to_bins(weights)
+
+if __name__ == '__main__':
+    np.savetxt('bins.txt',wavnum[::-1].copy())
+    np.savetxt('PFile.txt',P_grid_atm)

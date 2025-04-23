@@ -1,3 +1,5 @@
 .DS_store
 *.ipynb
 .ipynb_checkpoints
+bins.txt
+PFile.txt
