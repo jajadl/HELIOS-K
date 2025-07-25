@@ -1,0 +1,22 @@
+Database = 0
+Molecule number = 9
+Name = 09_hitran16
+Number of Isotopologues = 4
+#ID Abundance      Q(296K)   g     Molar Mass(g)  partition file :
+ 91     0.945678   6340.3     1      63.961901 q42.txt
+ 92      0.04195  6368.98     1      65.957695 q43.txt
+ 93   0.00746446    25607     4      64.961286 q137.txt
+ 94   0.00379256    13681     1      65.966146 q138.txt
+Number of columns in partition File = 2
+Number of line/transition files = 1
+Number of lines per file :
+975058
+Line file limits :
+0
+4160
+#ExoMol :
+Number of states = 0
+Number of columns in transition files = 0
+Default value of Lorentzian half-width for all lines = 0
+Default value of temperature exponent for all lines = 0
+Version = 0
