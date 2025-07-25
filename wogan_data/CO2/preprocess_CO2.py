@@ -1,71 +1,65 @@
 import subprocess
-import zipfile
 import os
 import shutil
+import zipfile
+import hapi
 
-folder = 'https://hitran.org/files/HITEMP/HITEMP-2010/CO2_line_list/'
-files = """
-02_00000-00500_HITEMP2010.zip
-02_00500-00625_HITEMP2010.zip
-02_00625-00750_HITEMP2010.zip
-02_00750-01000_HITEMP2010.zip
-02_01000-01500_HITEMP2010.zip
-02_01500-02000_HITEMP2010.zip
-02_02000-02125_HITEMP2010.zip
-02_02125-02250_HITEMP2010.zip
-02_02250-02500_HITEMP2010.zip
-02_02500-03000_HITEMP2010.zip
-02_03000-03250_HITEMP2010.zip
-02_03250-03500_HITEMP2010.zip
-02_03500-03750_HITEMP2010.zip
-02_03750-04000_HITEMP2010.zip
-02_04000-04500_HITEMP2010.zip
-02_04500-05000_HITEMP2010.zip
-02_05000-05500_HITEMP2010.zip
-02_05500-06000_HITEMP2010.zip
-02_06000-06500_HITEMP2010.zip
-02_06500-12785_HITEMP2010.zip
-""".split()
+def get_global_ids(molecule):
+    global_ids = []
+    for key in hapi.ISO:
+        if molecule == hapi.ISO[key][-1]:
+            global_ids.append(hapi.ISO[key][0])
+    return global_ids
+
+def get_molecule_id(molecule):
+    val = None
+    for key in hapi.ISO:
+        if molecule == hapi.ISO[key][-1]:
+            val = key[0]
+            break
+    return val
+
+def download_isotope_files(molecule):
+    global_ids = get_global_ids(molecule)
+    for val in global_ids:
+        # isotope stuff
+        url = 'https://hitran.org/data/Q/q'
+        cmd = f'curl -o data/q{val}.txt {url}{val}.txt'  # Use -o to specify output path
+        subprocess.call(cmd.split())
+    return global_ids
 
 def main():
 
-    # Download HITEMP data
-    for ffile in files:
-        cmd = 'wget --load-cookies=../../cookies.txt '+folder+ffile
-        subprocess.run(cmd.split())
-        os.rename(ffile, 'downloads/'+ffile)
+    molecule = 'CO2'
+    global_ids = download_isotope_files(molecule)
+    molecule_id = get_molecule_id(molecule)
 
-    # unzip the HITEMP data
-    for ffile in files:
-        with zipfile.ZipFile('downloads/'+ffile, 'r') as zip_ref:
-            zip_ref.extractall('extract')
+    # Download
+    hapi.fetch_by_ids(molecule, global_ids, 0, 1000000.0)
+    os.remove(molecule+'.header')
+
+    # Move to extract
+    os.rename(molecule+'.data', 'extract/'+str(molecule_id)+'_HITRAN2016.par')
 
     # copy files to the main directory
     tmp_files = []
     for a in os.listdir('extract'):
-        if 'par' in a:
-            if "HITEMP2010" in a:
-                aa = a.replace("HITEMP2010",'hitemp10')
+        if '.par' in a:
+            if "HITRAN2016" in a:
+                aa = a.replace("HITRAN2016",'hitran16')
 
-            tmp = aa.split('_')
-            start = tmp[1].split('-')[0]
-            start = start.rjust(5, '0')
-            end = tmp[1].split('-')[1]
-            end = end.rjust(5, '0')
-            tmp[1] = start+'-'+end
-            aa = "_".join(tmp)
             shutil.copy('extract/'+a, '../../'+aa)
             tmp_files.append(aa)
 
     # preprocess the files
-    cmd = "./hitran -M 02 -ISO 1 -in hitemp10"
+    cmd = "./hitran -M "+str(molecule_id)+" -in hitran16"
     subprocess.run(cmd.split(), cwd='../../')
 
     # move processesed data files into data dir
     for a in os.listdir('../../'):
-        if "hitemp10" in a and ".bin" in a:
+        if "hitran16" in a and ".bin" in a:
             os.rename('../../'+a, "data/"+a)
-        if "hitemp10.param" in a:
+        if "hitran16.param" in a:
             os.rename('../../'+a, "data/"+a)
     
     # delete the temporary files
