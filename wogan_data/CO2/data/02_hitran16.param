@@ -1,0 +1,27 @@
+Database = 0
+Molecule number = 2
+Name = 02_hitran16
+Number of Isotopologues = 12
+#ID Abundance      Q(296K)   g     Molar Mass(g)  partition file :
+ 21     0.984204   286.09     1       43.98983 q7.txt
+ 22     0.011057   576.64     2      44.993185 q8.txt
+ 23     0.003947   607.81     1      45.994076 q9.txt
+ 24  0.000733989  3542.61     6      44.994045 q10.txt
+ 25  4.43446e-05  1225.46     2      46.997431 q11.txt
+ 26  8.24623e-06  7141.32    12        45.9974 q12.txt
+ 27  3.95734e-06   323.42     1   47.998321999 q13.txt
+ 28   1.4718e-06  3766.58     6   46.998290999 q14.txt
+ 29  1.36847e-07  10971.6     1      45.998262 q121.txt
+ 20    4.446e-08   652.24     2      49.001675 q15.txt
+ 2A  1.65354e-08  7595.04    12      48.001646 q120.txt
+ 2B   1.5375e-09  22120.5     2   47.001618237 q122.txt
+Number of columns in partition File = 2
+Number of line/transition files = -1
+Number of lines per file :
+Line file limits :
+#ExoMol :
+Number of states = 0
+Number of columns in transition files = 0
+Default value of Lorentzian half-width for all lines = 0
+Default value of temperature exponent for all lines = 0
+Version = 0
