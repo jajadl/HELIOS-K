@@ -9,9 +9,12 @@ Number of Isotopologues = 5
  34  0.000740475  43330.8     6       48.98896 q19.txt
  35  0.000370237    21405     6       48.98896 q20.txt
 Number of columns in partition File = 2
-Number of line/transition files = -1
+Number of line/transition files = 1
 Number of lines per file :
+487466
 Line file limits :
+0
+6997
 #ExoMol :
 Number of states = 0
 Number of columns in transition files = 0
