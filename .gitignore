@@ -1,4 +1,15 @@
+# Large data files - DO NOT commit to git
+wogan_data/*/downloads/
+wogan_data/*/data/
+wogan_data/*/extract/
 
-# Sphinx
-docs/_build
+# Specific large file types
+*.bin
+*.bz2
+*.zip
+*.par
 
+# Temporary files
+*~
+*.tmp
+.DS_Store

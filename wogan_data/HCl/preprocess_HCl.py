@@ -1,35 +1,73 @@
 import subprocess
 import os
 import shutil
+import zipfile
 import hapi
-import requests
+
+def get_global_ids(molecule):
+    global_ids = []
+    for key in hapi.ISO:
+        if molecule == hapi.ISO[key][-1]:
+            global_ids.append(hapi.ISO[key][0])
+    return global_ids
+
+def get_molecule_id(molecule):
+    val = None
+    for key in hapi.ISO:
+        if molecule == hapi.ISO[key][-1]:
+            val = key[0]
+            break
+    return val
+
+def download_isotope_files(molecule):
+    global_ids = get_global_ids(molecule)
+
+    for val in global_ids:
+        # isotope stuff
+        url = 'https://hitran.org/data/Q/q'
+        cmd = 'wget '+url+str(val)+'.txt'
+        subprocess.call(cmd.split())
+        os.rename('q'+str(val)+'.txt', 'data/q'+str(val)+'.txt')
+
+    return global_ids
 
 def main():
 
-    # Download lines
-    hapi.fetch('HCl', 15, 1, 1, 1_000_000)
-    os.remove('HCl.header')
-    tmpfile = '15_hitran.par'
-    os.rename('HCl.data','../../'+tmpfile)
+    molecule = 'HCl'
+    global_ids = download_isotope_files(molecule)
+    molecule_id = get_molecule_id(molecule)
 
-    # Download isotope file
-    r = requests.get('https://hitran.org/data/Q/q52.txt')
-    with open('data/q52.txt', "w") as f:
-        f.write(r.text)
+    # Download
+    hapi.fetch_by_ids(molecule, global_ids, 0, 1000000.0)
+    os.remove(molecule+'.header')
 
-    # Process
-    cmd = "./hitran -M 15 -ISO 1 -in hitran"
+    # Move to extract
+    os.rename(molecule+'.data', 'extract/'+str(molecule_id)+'_HITRAN2016.par')
+
+    # copy files to the main directory
+    tmp_files = []
+    for a in os.listdir('extract'):
+        if '.par' in a:
+            if "HITRAN2016" in a:
+                aa = a.replace("HITRAN2016",'hitran16')
+
+            shutil.copy('extract/'+a, '../../'+aa)
+            tmp_files.append(aa)
+
+    # preprocess the files
+    cmd = "./hitran -M "+str(molecule_id)+" -in hitran16"
     subprocess.run(cmd.split(), cwd='../../')
 
     # move processesed data files into data dir
     for a in os.listdir('../../'):
-        if "hitran" in a and ".bin" in a:
+        if "hitran16" in a and ".bin" in a:
             os.rename('../../'+a, "data/"+a)
-        if "hitran.param" in a:
+        if "hitran16.param" in a:
             os.rename('../../'+a, "data/"+a)
     
-    # delete tempfile
-    os.remove('../../'+tmpfile)
+    # delete the temporary files
+    for tmp in tmp_files:
+        os.remove('../../'+tmp)
 
 if __name__ == "__main__":
     main()
