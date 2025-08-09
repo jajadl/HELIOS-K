@@ -8,8 +8,8 @@ def download_partition_functions():
     """Download partition function files for CH4 isotopologues"""
     os.makedirs('data', exist_ok=True)
     
-    # CH4 isotopologues use q32.txt, q33.txt, q34.txt, q35.txt
-    q_files = [32, 33, 34, 35]
+    # CH4 HITEMP 2020 isotopologues use q61.txt, q62.txt, q63.txt, q64.txt
+    q_files = [61, 62, 63, 64]
     
     # Check if wget or curl is available
     if platform.system() == "Darwin":  # macOS
